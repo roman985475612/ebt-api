@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\NewsController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -14,6 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::get('/news', [NewsController::class, 'index']);
+Route::post('/news', [NewsController::class, 'store']);
+Route::get('/news/{news}', [NewsController::class, 'show']);
+Route::put('/news/{news}', [NewsController::class, 'update']);

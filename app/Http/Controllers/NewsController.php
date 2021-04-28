@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\News;
+use App\Http\Requests\NewsRequest;
+use App\Http\Requests\StatusPatchRequest;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
@@ -12,30 +14,23 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        if(empty($request->s)) {
+            return News::all();
+        }
+        return News::findByTitle($request->s);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\NewsRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(NewsRequest $request)
     {
-        //
+        return News::create($request->validated());
     }
 
     /**
@@ -46,40 +41,21 @@ class NewsController extends Controller
      */
     public function show(News $news)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\News  $news
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(News $news)
-    {
-        //
+        return $news;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\StatusPatchRequest  $request
      * @param  \App\Models\News  $news
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, News $news)
+    public function update(StatusPatchRequest $request, News $news)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\News  $news
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(News $news)
-    {
-        //
+        $validated = $request->validated();
+        $news->status = $validated['status'];
+        $news->save();
+        return $news;
     }
 }
