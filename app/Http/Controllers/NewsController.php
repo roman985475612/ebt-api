@@ -14,12 +14,12 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $s = null)
     {
-        if(empty($request->s)) {
-            return News::all();
+        if(is_null($s)) {
+            return News::getAll(auth()->user()->is_admin);
         }
-        return News::findByTitle($request->s);
+        return News::findByTitle($s, auth()->user()->is_admin);
     }
 
     /**
@@ -30,7 +30,12 @@ class NewsController extends Controller
      */
     public function store(NewsRequest $request)
     {
-        return News::create($request->validated());
+        if(auth()->user()->is_admin) {
+            return News::create($request->validated());
+        }
+        return response([
+            'message' => 'You do not have sufficient rights for this operation'
+        ], 403);
     }
 
     /**
@@ -39,9 +44,9 @@ class NewsController extends Controller
      * @param  \App\Models\News  $news
      * @return \Illuminate\Http\Response
      */
-    public function show(News $news)
+    public function show($id)
     {
-        return $news;
+        return News::getOne($id, auth()->user()->is_admin);
     }
 
     /**
@@ -53,9 +58,14 @@ class NewsController extends Controller
      */
     public function update(StatusPatchRequest $request, News $news)
     {
-        $validated = $request->validated();
-        $news->status = $validated['status'];
-        $news->save();
-        return $news;
+        if(auth()->user()->is_admin) {
+            $fields = $request->validated();
+            $news->status = $fields['status'];
+            $news->save();
+            return $news;
+        }
+        return response([
+            'message' => 'You do not have sufficient rights for this operation'
+        ], 403);
     }
 }
